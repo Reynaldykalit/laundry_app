@@ -1,67 +1,28 @@
-// const mysql = require("mysql2");
-
-// // Konfigurasi koneksi ke database
-// const db = mysql.createConnection({
-//   host: "host.docker.internal",
-//   user: "root",        // user default XAMPP
-//   password: "",        // password default XAMPP kosong
-//   database: "laundry_db"
-// });
-
-// // Cek koneksi
-// db.connect((err) => {
-//   if (err) {
-//     console.error("Database connection failed: " + err.stack);
-//     return;
-//   }
-//   console.log("Connected to MySQL database.");
-// });
-
-// module.exports = db;
-
 const mysql = require("mysql2");
 
-// Gunakan environment variable dari docker-compose
-// const db = mysql.createConnection({
-//   host: process.env.DB_HOST || "laundry-db",
-//   user: process.env.DB_USER || "root",
-//   password: process.env.DB_PASSWORD || "root",
-//   database: process.env.DB_NAME || "laundry_db",
-//   port: 3306
-// });
+// Debug: Lihat environment variables
+console.log("=== DATABASE CONFIG ===");
+console.log("DB_HOST:", process.env.DB_HOST);
+console.log("DB_USER:", process.env.DB_USER);
+console.log("DB_NAME:", process.env.DB_NAME);
+console.log("======================");
 
-// // Cek koneksi
-// db.connect((err) => {
-//   if (err) {
-//     console.error("❌ Database connection failed:", err.stack);
-//     return;
-//   }
-//   console.log("✅ Connected to MySQL database.");
-// });
+// Konfigurasi untuk Docker Container
+const db = mysql.createConnection({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "laundry_db",
+  port: process.env.DB_PORT || 3306,
+});
 
-// module.exports = db;
+// Cek koneksi
+db.connect((err) => {
+  if (err) {
+    console.error("Gagal konek ke database:", err);
+    return;
+  }
+  console.log("✅ Berhasil terhubung ke database MySQL");
+});
 
-const mysql = require("mysql2");
-
-const connectWithRetry = () => {
-  const db = mysql.createConnection({
-    host: process.env.DB_HOST || "laundry-mysql",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "root",
-    database: process.env.DB_NAME || "laundry_db",
-    port: 3306
-  });
-
-  db.connect((err) => {
-    if (err) {
-      console.error("❌ Database connection failed, retrying in 5s...", err.code);
-      setTimeout(connectWithRetry, 5000);
-    } else {
-      console.log("✅ Connected to MySQL database.");
-    }
-  });
-
-  module.exports = db;
-};
-
-connectWithRetry();
+module.exports = db;

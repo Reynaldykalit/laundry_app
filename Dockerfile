@@ -1,19 +1,18 @@
-# Gunakan image Node.js versi 18
-FROM node:18
+FROM node:18-alpine
 
-# Tentukan folder kerja di dalam container
 WORKDIR /app
 
-# Salin file package.json dan package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Install semua dependensi
+# Install dependencies
 RUN npm install
 
-# Salin semua file proyek ke dalam container
+# Copy application files
 COPY . .
 
-# Tentukan port yang digunakan aplikasi
+# Expose port
 EXPOSE 3000
 
-CMD ["node", "app.js"]
+# Start application
+CMD ["npm", "start"]
