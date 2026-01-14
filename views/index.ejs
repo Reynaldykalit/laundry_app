@@ -1,0 +1,37 @@
+<h3>Data Transaksi</h3>
+
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tanggal</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>No HP</th>
+            <th>Jenis Laundry</th>
+            <th>Biaya</th>
+            <th>Diskon (%)</th>
+            <th>Total Pembayaran</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% transaksi.forEach(t => { %>
+        <tr>
+            <td><%= t.id %></td>
+            <td><%= t.tanggal ? new Date(t.tanggal).toISOString().split('T')[0] : '' %></td>
+            <td><%= t.nama %></td>
+            <td><%= t.alamat %></td>
+            <td><%= t.no_hp %></td>
+            <td><%= t.jenis_laundry %></td>
+            <td>Rp <%= t.biaya.toLocaleString('id-ID') %></td>
+            <td><%= t.diskon %> %</td>
+            <td>Rp <%= t.total.toLocaleString('id-ID') %></td>
+            <td>
+                <a href="/edit/<%= t.id %>">Edit</a> |
+                <a href="/delete/<%= t.id %>" onclick="return confirm('Yakin?')">Delete</a>
+            </td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>

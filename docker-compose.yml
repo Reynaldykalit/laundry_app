@@ -1,0 +1,111 @@
+# version: '3.9'
+# services:
+#   db:
+#     image: mysql:8
+#     container_name: laundry-db
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: laundry_db
+#       # MYSQL_USER: root
+#       MYSQL_PASSWORD: root
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+#   app:
+#     build: .
+#     container_name: laundry-app
+#     restart: always
+#     environment:
+#       DB_HOST: db
+#       DB_USER: root
+#       DB_PASSWORD: root
+#       DB_NAME: laundry_db
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - db
+#     command: ["node", "app.js"]
+
+# volumes:
+#   db_data:
+
+# services:
+#   laundry-db:
+#     image: mysql:8
+#     container_name: laundry-db
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: laundry_db
+#     ports:
+#       - "3307:3306"
+#     volumes:
+#       - db_data:/var/lib/mysql
+
+#   laundry-app:
+#     build: .
+#     container_name: laundry-app
+#     restart: always
+#     depends_on:
+#       - laundry-db
+#     working_dir: /app
+#     command: ["node", "app.js"]
+#     environment:
+#       DB_HOST: laundry-db
+#       DB_USER: root
+#       DB_PASSWORD: root
+#       DB_NAME: laundry_db
+#     ports:
+#       - "3000:3000"
+
+# volumes:
+#   db_data:
+
+version: "3.8"
+services:
+  laundry-db:
+    image: mysql:8
+    container_name: laundry-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laundry_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - laundry-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      retries: 10
+
+  laundry-app:
+    build: .
+    container_name: laundry-app
+    restart: always
+    depends_on:
+      laundry-db:
+        condition: service_healthy
+    working_dir: /app
+    command: ["node", "app.js"]
+    environment:
+      DB_HOST: laundry-db
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: laundry_db
+    ports:
+      - "3000:3000"
+    networks:
+      - laundry-net
+
+volumes:
+  db_data:
+
+networks:
+  laundry-net:
+    driver: bridge

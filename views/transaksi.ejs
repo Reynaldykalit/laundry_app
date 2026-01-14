@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daftar Transaksi Laundry</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: #333;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: 600;
+        }
+        .user-info a {
+            color: #e74c3c;
+            text-decoration: none;
+            margin-left: 15px;
+            font-weight: bold;
+        }
+        .user-info a:hover {
+            text-decoration: underline;
+        }
+        h2.page-title {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            table-layout: fixed; /* Membatasi lebar kolom */
+        }
+        th, td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+            white-space: normal;
+            word-break: break-word;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        /* Batas maksimal lebar kolom Diskon, Total dan Aksi */
+        th:nth-child(8), td:nth-child(8),
+        th:nth-child(9), td:nth-child(9),
+        th:nth-child(10), td:nth-child(10) {
+            max-width: 100px;
+            overflow-wrap: break-word;
+        }
+        tbody tr:hover {
+            background-color: #f1f8ff;
+            cursor: pointer;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #388e3c;
+            text-decoration: underline;
+        }
+        td:last-child a {
+            margin: 0 8px;
+            white-space: normal;
+        }
+        .add-transaction {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .add-transaction a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .add-transaction a:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="page-title">Daftar Transaksi</h2>
+    <p class="user-info">
+        Selamat datang, <%= user.username %> | <a href="/logout">Logout</a>
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tanggal</th>
+                <th>Nama</th>
+                <th>Alamat</th>
+                <th>No HP</th>
+                <th>Jenis Laundry</th>
+                <th>Biaya</th>
+                <th>Diskon (%)</th>
+                <th>Total</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% transaksi.forEach(t => { %>
+            <tr>
+                <td><%= t.id %></td>
+                <td><%= new Date(t.tanggal).toLocaleDateString() %></td>
+                <td><%= t.nama %></td>
+                <td><%= t.alamat %></td>
+                <td><%= t.no_hp %></td>
+                <td><%= t.jenis_laundry %></td>
+                <td>Rp <%= t.biaya.toLocaleString() %></td>
+                <td><%= t.diskon %></td>
+                <td>Rp <%= t.total.toLocaleString() %></td>
+                <td>
+                    <a href="/edit/<%= t.id %>">Edit</a> |
+                    <a href="/transaksi/delete/<%= t.id %>" onclick="return confirm('Yakin hapus data ini?')">Hapus</a>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <div class="add-transaction">
+        <a href="/tambah">Tambah Transaksi</a>
+    </div>
+</body>
+</html>

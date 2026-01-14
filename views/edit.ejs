@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Transaksi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h2>Edit Transaksi</h2>
+    <form action="/edit/<%= transaksi.id %>" method="POST">
+        <label for="tanggal">Tanggal:</label>
+        <input type="date" id="tanggal" name="tanggal" value="<%= transaksi.tanggal ? new Date(transaksi.tanggal).toISOString().split('T')[0] : '' %>" required>
+
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" value="<%= transaksi.nama %>" required>
+
+        <label for="alamat">Alamat:</label>
+        <input type="text" id="alamat" name="alamat" value="<%= transaksi.alamat %>" required>
+
+        <label for="no_hp">No HP:</label>
+        <input type="text" id="no_hp" name="no_hp" value="<%= transaksi.no_hp %>" required>
+
+        <label for="jenisLaundry">Jenis Laundry:</label>
+        <select id="jenisLaundry" name="jenis_laundry" required>
+            <% jenis.forEach(j => { %>
+                <option value="<%= j.nama %>" data-biaya="<%= j.biaya %>" <% if(j.nama === transaksi.jenis_laundry) { %>selected<% } %>>
+                    <%= j.nama %>
+                </option>
+            <% }) %>
+        </select>
+
+        <label for="biaya">Biaya:</label>
+        <input type="number" id="biaya" name="biaya" value="<%= transaksi.biaya %>" readonly required>
+
+        <label for="diskon">Diskon (%):</label>
+        <input type="number" id="diskon" name="diskon" value="<%= transaksi.diskon %>" readonly required>
+
+        <label for="total">Total Pembayaran:</label>
+        <input type="number" id="total" name="total" value="<%= transaksi.total %>" readonly required>
+
+        <button type="submit">Update</button>
+    </form>
+
+    <script>
+        const tanggalInput = document.getElementById('tanggal');
+        const jenisLaundrySelect = document.getElementById('jenisLaundry');
+        const biayaInput = document.getElementById('biaya');
+        const diskonInput = document.getElementById('diskon');
+        const totalInput = document.getElementById('total');
+
+        function updateFields() {
+            // Ambil biaya dari option yang dipilih
+            const selectedOption = jenisLaundrySelect.options[jenisLaundrySelect.selectedIndex];
+            const biayaValue = parseFloat(selectedOption.getAttribute('data-biaya')) || 0;
+            biayaInput.value = biayaValue.toFixed(2);
+
+            // Cek tanggal kembar
+            const tanggalValue = tanggalInput.value;
+            let diskon = 0;
+            if (tanggalValue) {
+                const dateObj = new Date(tanggalValue);
+                const hari = dateObj.getDate();
+                const bulan = dateObj.getMonth() + 1;
+                if (hari === bulan) {
+                    diskon = 25;
+                }
+            }
+            diskonInput.value = diskon;
+
+            // Hitung total setelah diskon
+            const diskonNominal = (biayaValue * diskon) / 100;
+            const total = biayaValue - diskonNominal;
+            totalInput.value = total.toFixed(2);
+        }
+
+        tanggalInput.addEventListener('change', updateFields);
+        jenisLaundrySelect.addEventListener('change', updateFields);
+
+        window.addEventListener('DOMContentLoaded', updateFields);
+    </script>
+</body>
+</html>

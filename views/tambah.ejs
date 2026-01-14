@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah dan Daftar Transaksi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: #333;
+        }
+        h2.title-center {
+            text-align: center;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .home-link {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        .home-link a {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .home-link a:hover {
+            background-color: #388e3c;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px 0;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 40px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            table-layout: fixed;
+        }
+        thead {
+            background-color: #4CAF50;
+            color: white;
+            text-transform: uppercase;
+        }
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+            word-break: break-word;
+            white-space: nowrap;
+        }
+        /* Atur lebar kolom agar tidak terlalu besar */
+        th:nth-child(1), td:nth-child(1) { width: 40px; }
+        th:nth-child(2), td:nth-child(2) { width: 80px; }
+        th:nth-child(3), td:nth-child(3) { width: 120px; }
+        th:nth-child(4), td:nth-child(4) { width: 140px; }
+        th:nth-child(5), td:nth-child(5) { width: 100px; }
+        th:nth-child(6), td:nth-child(6) { width: 110px; }
+        th:nth-child(7), td:nth-child(7) { width: 80px; }
+        th:nth-child(8), td:nth-child(8) { width: 70px; }
+        th:nth-child(9), td:nth-child(9) { width: 90px; }
+        th:nth-child(10), td:nth-child(10) { width: 110px; white-space: normal; }
+        tbody tr:hover {
+            background-color: #f1f8ff;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h2 class="title-center">Tambah Transaksi Baru</h2>
+    
+    <div class="home-link">
+        <a href="/transaksi">Home</a>
+    </div>
+
+    <form method="POST" action="/transaksi/tambah" id="formTransaksi">
+        <label for="tanggal">Tanggal:</label>
+        <input type="date" name="tanggal" id="tanggal" required>
+
+        <label for="nama">Nama:</label>
+        <input type="text" name="nama" id="nama" required>
+
+        <label for="alamat">Alamat:</label>
+        <input type="text" name="alamat" id="alamat" required>
+
+        <label for="no_hp">No HP:</label>
+        <input type="text" name="no_hp" id="no_hp" required>
+
+        <label for="jenisLaundry">Jenis Laundry:</label>
+        <select name="jenis_laundry" id="jenisLaundry" required>
+            <% jenis.forEach(j => { %>
+                <option value="<%= j.nama %>" data-biaya="<%= j.biaya %>"><%= j.nama %></option>
+            <% }) %>
+        </select>
+
+        <label for="diskon">Diskon (% otomatis):</label>
+        <input type="number" name="diskon" id="diskon" value="0" readonly>
+
+        <label for="biaya">Biaya:</label>
+        <input type="number" name="biaya" id="biaya" readonly>
+
+        <label for="total">Total:</label>
+        <input type="number" name="total" id="total" readonly>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+    <hr>
+
+    <script>
+        const tanggalInput = document.getElementById('tanggal');
+        const diskonInput = document.getElementById('diskon');
+        const jenisLaundrySelect = document.getElementById('jenisLaundry');
+        const biayaInput = document.getElementById('biaya');
+        const totalInput = document.getElementById('total');
+
+        function updateBiayaDanDiskon() {
+            const selectedOption = jenisLaundrySelect.options[jenisLaundrySelect.selectedIndex];
+            const biayaValue = parseFloat(selectedOption.getAttribute('data-biaya')) || 0;
+
+            biayaInput.value = biayaValue.toFixed(2);
+
+            const tanggalValue = tanggalInput.value;
+            let diskon = 0;
+
+            if (tanggalValue) {
+                const dateObj = new Date(tanggalValue);
+                const hari = dateObj.getDate();
+                const bulan = dateObj.getMonth() + 1;
+
+                if (hari === bulan) {
+                    diskon = 25;
+                }
+            }
+            diskonInput.value = diskon;
+
+            const diskonNominal = (biayaValue * diskon) / 100;
+            const total = biayaValue - diskonNominal;
+            totalInput.value = total.toFixed(2);
+        }
+
+        jenisLaundrySelect.addEventListener('change', updateBiayaDanDiskon);
+        tanggalInput.addEventListener('change', updateBiayaDanDiskon);
+        window.addEventListener('DOMContentLoaded', updateBiayaDanDiskon);
+    </script>
+</body>
+</html>

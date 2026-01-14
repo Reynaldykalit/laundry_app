@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah Transaksi</title>
+</head>
+<body>
+    <h3>Tambah Transaksi</h3>
+    <form method="POST" action="/transaksi/tambah" id="formTransaksi">
+
+        <label>Tanggal:</label><br>
+        <input type="date" name="tanggal" id="tanggal" required><br><br>
+
+        <label>Nama:</label><br>
+        <input type="text" name="nama" required><br><br>
+
+        <label>Alamat:</label><br>
+        <input type="text" name="alamat" required><br><br>
+
+        <label>No HP:</label><br>
+        <input type="text" name="no_hp" required><br><br>
+
+        <label>Jenis Laundry:</label><br>
+        <select name="jenis_laundry" id="jenisLaundry" required>
+            <% jenis.forEach(j => { %>
+                <option value="<%= j.nama %>" data-biaya="<%= j.biaya %>"><%= j.nama %></option>
+            <% }) %>
+        </select><br><br>
+
+        <label>Diskon (% otomatis):</label><br>
+        <input type="number" name="diskon" id="diskon" value="0" readonly><br><br>
+
+        <label>Biaya:</label><br>
+        <input type="number" name="biaya" id="biaya" readonly><br><br>
+
+        <label>Total:</label><br>
+        <input type="number" name="total" id="total" readonly><br><br>
+
+        <button type="submit">Simpan</button>
+    </form>
+
+<script>
+    const jenisLaundrySelect = document.getElementById('jenisLaundry');
+    const tanggalInput = document.getElementById('tanggal');
+    const diskonInput = document.getElementById('diskon');
+    const biayaInput = document.getElementById('biaya');
+    const totalInput = document.getElementById('total');
+
+    function hitungTotal() {
+        const selectedOption = jenisLaundrySelect.options[jenisLaundrySelect.selectedIndex];
+        const biayaSatuan = parseFloat(selectedOption.dataset.biaya) || 0;
+        const tanggal = new Date(tanggalInput.value);
+
+        if (!tanggalInput.value) {
+            diskonInput.value = 0;
+            biayaInput.value = 0;
+            totalInput.value = 0;
+            return;
+        }
+
+        // Diskon 25% untuk tanggal 1 Januari atau 2 Februari
+        let diskon = 0;
+        if ((tanggal.getDate() === 1 && tanggal.getMonth() === 0) ||
+            (tanggal.getDate() === 2 && tanggal.getMonth() === 1)) {
+            diskon = 25;
+        }
+
+        diskonInput.value = diskon;
+
+        const biayaTotal = biayaSatuan;
+        biayaInput.value = biayaTotal.toFixed(2);
+
+        const diskonNominal = (biayaTotal * diskon) / 100;
+        const total = biayaTotal - diskonNominal;
+
+        totalInput.value = total.toFixed(2);
+    }
+
+    jenisLaundrySelect.addEventListener('change', hitungTotal);
+    tanggalInput.addEventListener('change', hitungTotal);
+
+    // Hitung saat halaman load
+    hitungTotal();
+</script>
+</body>
+</html>
