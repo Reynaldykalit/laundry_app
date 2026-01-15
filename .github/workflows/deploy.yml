@@ -1,43 +1,46 @@
-name: CI/CD Laundry App to Kubernetes
+name: CI/CD Laundry App
 
 on:
   push:
-    branches: ["main"] # Pastikan branch utama Anda bernama 'main'
+    branches:
+      - main # Akan jalan otomatis saat Anda push ke branch main
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      # --- BAGIAN CI (Continuous Integration) ---
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          # Sesuaikan 'reynise' dengan username Docker Hub Anda
-          tags: reynise/laundry-app:latest
-
-      # --- BAGIAN CD (Continuous Deployment pada Kubernetes) ---
-      - name: Deploy to Kubernetes Simulation
+      - name: Build and Push Docker Image
         run: |
-          echo "Image successfully pushed to Docker Hub."
-          echo "Connecting to Kubernetes Cluster..."
+          # Ganti 'reynaldy' dengan username Docker Hub Anda
+          docker build -t reynaldy/laundry-app:latest .
+          docker push reynaldy/laundry-app:latest
 
-          # Ini adalah instruksi kunci untuk Poin 3
-          # Menerapkan manifest ke cluster
-          echo "Executing: kubectl apply -f mysql-deploy.yaml"
-          echo "Executing: kubectl apply -f laundry-deploy.yaml"
-          echo "Executing: kubectl apply -f laundry-service.yaml"
+  deploy-to-kubernetes:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-          # Memaksa Kubernetes melakukan update (Rolling Update)
-          echo "Executing: kubectl rollout restart deployment/laundry-deployment"
+      - name: Set up Kubeconfig
+        # Bagian ini mensimulasikan koneksi ke cluster K8s
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+
+      - name: Deploy to K8s
+        run: |
+          kubectl apply -f mysql-deploy.yaml
+          kubectl apply -f laundry-deploy.yaml
+          kubectl apply -f laundry-service.yaml
+          # Memastikan Pod mengambil image terbaru yang baru dipush
+          kubectl rollout restart deployment/laundry-deployment
