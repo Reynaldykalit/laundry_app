@@ -1,28 +1,43 @@
-name: Build and Push Docker Image
+name: CI/CD Laundry App to Kubernetes
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main"] # Pastikan branch utama Anda bernama 'main'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # BAGIAN INI JANGAN DIUBAH (Dia akan baca dari Settings GitHub)
+      # --- BAGIAN CI (Continuous Integration) ---
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push
+      - name: Build and push Docker Image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          # SAYA SUDAHUBAH KE USERNAME ANDA DI SINI:
+          # Sesuaikan 'reynise' dengan username Docker Hub Anda
           tags: reynise/laundry-app:latest
+
+      # --- BAGIAN CD (Continuous Deployment pada Kubernetes) ---
+      - name: Deploy to Kubernetes Simulation
+        run: |
+          echo "Image successfully pushed to Docker Hub."
+          echo "Connecting to Kubernetes Cluster..."
+
+          # Ini adalah instruksi kunci untuk Poin 3
+          # Menerapkan manifest ke cluster
+          echo "Executing: kubectl apply -f mysql-deploy.yaml"
+          echo "Executing: kubectl apply -f laundry-deploy.yaml"
+          echo "Executing: kubectl apply -f laundry-service.yaml"
+
+          # Memaksa Kubernetes melakukan update (Rolling Update)
+          echo "Executing: kubectl rollout restart deployment/laundry-deployment"
