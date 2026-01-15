@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: laundry-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: laundry
+  ports:
+    - protocol: TCP
+      port: 80 # Ini port untuk browser (http://ip-minikube:80)
+      targetPort: 3000 # Ini port aplikasi Anda (sesuai app.listen 3000)

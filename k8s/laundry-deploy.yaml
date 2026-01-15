@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laundry-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # <--- Kemungkinan error Anda ada di sekitar sini tadi
+      app: laundry
+  template:
+    metadata:
+      labels:
+        app: laundry
+    spec:
+      containers:
+        - name: laundry-app
+          image: laundry-app-laundry-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DB_HOST
+              value: "mysql-service"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              value: "rahasiadong"
+            - name: DB_NAME
+              value: "laundry_db"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
